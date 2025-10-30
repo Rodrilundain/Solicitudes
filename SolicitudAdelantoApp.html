@@ -1,0 +1,335 @@
+<!-- Archivo: SolicitudAdelantoApp.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .logo-emulado {
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-family: 'Arial Black', sans-serif;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .logo-emulado .linea1 {
+      font-size: 24px;
+      letter-spacing: 2px;
+      color: #ffffff;
+    }
+    .logo-emulado .linea2 {
+      font-size: 32px;
+      letter-spacing: 2px;
+      color: #ffffff;
+      font-weight: bold;
+    }
+    .contenedor-3d {
+      perspective: 1000px;
+      width: 90%;
+      max-width: 400px;
+      height: auto;
+      margin-top: 80px;
+    }
+    .flip-card-inner {
+      width: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+    .vista {
+      position: absolute;
+      width: 100%;
+      backface-visibility: hidden;
+      background: #1f1f1f;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      display: none;
+    }
+    .adelanto, .registro, .historial {
+      transform: rotateY(0deg);
+    }
+    .registro { transform: rotateY(180deg); }
+    .historial { transform: rotateY(-180deg); }
+    .show-adelanto .adelanto,
+    .show-registro .registro,
+    .show-historial .historial {
+      display: block;
+    }
+    .show-adelanto .flip-card-inner {
+      transform: rotateY(0deg);
+    }
+    .show-registro .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .show-historial .flip-card-inner {
+      transform: rotateY(-180deg);
+    }
+    input, button, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      background: #333;
+      color: #fff;
+      font-size: 16px;
+    }
+    button {
+      background: #007bff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover { background: #0056b3; }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .modal {
+      background: #2c2c2c;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 90%;
+      max-width: 300px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid #444;
+    }
+    th { border-bottom: 1px solid #ccc; }
+    #formularioAdelanto { display: none; }
+  </style>
+</head>
+<body>
+  <div class="logo-emulado">
+    <div class="linea1">GRUPO</div>
+    <div class="linea2">FIANCAR</div>
+  </div>
+  <div class="contenedor-3d show-adelanto" id="contenedor3D">
+    <div class="flip-card-inner">
+      <div class="vista adelanto">
+        <h2>Inicio de Sesión</h2>
+        <p id="mensajeConfirmacion"></p>
+        <input type="text" id="ci" placeholder="Ingrese su CI">
+        <button onclick="verificar()">Ingresar</button>
+        <button id="btnRegistro" onclick="rotarA('registro')">Registrarse</button>
+        <button id="btnAdelanto" onclick="solicitarAdelanto()" style="display:none;">Solicitud de Adelanto</button>
+        <button id="btnHistorial" onclick="rotarA('historial')" style="display:none;">Historial de Solicitudes</button>
+        <div id="formularioAdelanto">
+          <input type="number" id="monto" placeholder="Monto solicitado">
+          <input type="text" id="celular" placeholder="Número de celular">
+          <button onclick="mostrarModal()">Enviar Solicitud</button>
+        </div>
+      </div>
+      <div class="vista registro">
+        <h2>Registro</h2>
+        <input type="text" id="nombre1" placeholder="Primer Nombre">
+        <input type="text" id="nombre2" placeholder="Segundo Nombre">
+        <input type="text" id="apellido1" placeholder="Primer Apellido">
+        <input type="text" id="apellido2" placeholder="Segundo Apellido">
+        <input type="text" id="ciRegistro" placeholder="CI">
+        <input type="text" id="celRegistro" placeholder="Celular">
+        <input type="email" id="emailRegistro" placeholder="Email">
+        <select id="sucursalRegistro">
+          <option value="">Seleccionar Sucursal</option>
+          <option value="RONDEAU">RONDEAU</option>
+          <option value="TERMINAL">TERMINAL</option>
+          <option value="SHOPPING DE AUTOS">SHOPPING DE AUTOS</option>
+          <option value="CAR ONE">CAR ONE</option>
+          <option value="CARRASCO">CARRASCO</option>
+          <option value="CHEVROLET MONTEVIDEO">CHEVROLET MONTEVIDEO</option>
+          <option value="DEPÓSITO ESTAWOL">DEPÓSITO ESTAWOL</option>
+          <option value="OFICINAS ESTAWOL">OFICINAS ESTAWOL</option>
+        </select>
+        <button onclick="registrarUsuario()">Confirmar Registro</button>
+        <button onclick="rotarA('adelanto')">Volver</button>
+      </div>
+      <div class="vista historial">
+        <h2>Historial de Solicitudes</h2>
+        <div id="tablaHistorial"></div>
+        <button onclick="rotarA('adelanto')">Volver</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="modalConfirmacion">
+    <div class="modal">
+      <p id="textoConfirmacion"></p>
+      <button onclick="confirmarEnvio()">Confirmar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+  <div class="modal-overlay" id="modalExito">
+    <div class="modal">
+      <p id="textoExito"></p>
+      <button onclick="cerrarModalExito()">Aceptar</button>
+    </div>
+  </div>
+  <div class="modal-overlay" id="modalError">
+    <div class="modal">
+      <p id="textoError"></p>
+      <button onclick="cerrarModalError()">Cerrar</button>
+    </div>
+  </div>
+  <script>
+    let datosUsuario = null;
+    let montoTemp = "";
+    let celularTemp = "";
+    let adelantoSolicitado = false;
+
+    function rotarA(vista) {
+      const cont = document.getElementById("contenedor3D");
+      cont.className = "contenedor-3d show-" + vista;
+
+      if (vista !== 'adelanto') {
+        document.getElementById("formularioAdelanto").style.display = "none";
+      } else {
+        const mostrar = datosUsuario !== null && adelantoSolicitado;
+        document.getElementById("formularioAdelanto").style.display = mostrar ? "block" : "none";
+      }
+
+      if (vista === 'historial' && datosUsuario) {
+        google.script.run.withSuccessHandler(mostrarHistorial).obtenerHistorial(datosUsuario.ci);
+      }
+    }
+
+    function solicitarAdelanto() {
+      adelantoSolicitado = !adelantoSolicitado;
+      rotarA('adelanto');
+    }
+
+    function verificar() {
+      const ci = document.getElementById("ci").value.trim();
+      if (!ci) return mostrarError("Ingrese su CI");
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.ok) {
+          datosUsuario = res.datos;
+          document.getElementById("mensajeConfirmacion").style.color = "lightgreen";
+          document.getElementById("mensajeConfirmacion").innerText = `Hola ${datosUsuario.nombre1} ${datosUsuario.apellido1} ! Ingrese los datos de su solicitud.`;
+          document.getElementById("btnHistorial").style.display = "block";
+          document.getElementById("btnAdelanto").style.display = "block";
+          document.getElementById("btnRegistro").style.display = "none";
+        } else {
+          mostrarError("CI no encontrado.");
+        }
+      }).verificarUsuario(ci);
+    }
+
+    function registrarUsuario() {
+      const datos = {
+        nombre1: document.getElementById("nombre1").value.trim(),
+        nombre2: document.getElementById("nombre2").value.trim(),
+        apellido1: document.getElementById("apellido1").value.trim(),
+        apellido2: document.getElementById("apellido2").value.trim(),
+        ci: document.getElementById("ciRegistro").value.trim(),
+        cel: document.getElementById("celRegistro").value.trim(),
+        email: document.getElementById("emailRegistro").value.trim(),
+        sucursal: document.getElementById("sucursalRegistro").value.trim()
+      };
+      if (!datos.nombre1 || !datos.apellido1 || !datos.ci || !datos.cel || !datos.email || !datos.sucursal) {
+        return mostrarError("Complete todos los campos obligatorios, incluyendo la sucursal.");
+      }
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.ok) {
+          document.getElementById("mensajeConfirmacion").style.color = "lightgreen";
+          document.getElementById("mensajeConfirmacion").innerText = res.mensaje;
+          rotarA('adelanto');
+        } else {
+          mostrarError(res.mensaje);
+        }
+      }).registrarNuevoUsuario(datos);
+    }
+
+    function mostrarModal() {
+      montoTemp = document.getElementById("monto").value.trim();
+      celularTemp = document.getElementById("celular").value.trim();
+      if (!montoTemp || !celularTemp) {
+        return mostrarError("Complete todos los campos de la solicitud.");
+      }
+      const hoy = new Date().getDate();
+      if (hoy === 9 || hoy === 10 || hoy === 19 || hoy === 20) {
+        return mostrarError("❌ Fuera de fecha habilitada para solicitar adelantos.");
+      }
+      const texto = `Hola ${datosUsuario.nombre1}, estás por solicitar un adelanto por $${montoTemp}. ¿Deseas continuar?`;
+      document.getElementById("textoConfirmacion").innerText = texto;
+      document.getElementById("modalConfirmacion").style.display = "flex";
+    }
+
+    function confirmarEnvio() {
+      document.getElementById("modalConfirmacion").style.display = "none";
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.ok) {
+          document.getElementById("textoExito").innerText = res.mensaje;
+          document.getElementById("modalExito").style.display = "flex";
+          setTimeout(cerrarModalExito, 4000);
+        } else {
+          mostrarError(res.mensaje);
+        }
+      }).registrarSolicitud(datosUsuario, celularTemp, montoTemp);
+    }
+
+    function cerrarModalExito() {
+      document.getElementById("modalExito").style.display = "none";
+      adelantoSolicitado = false;
+      document.getElementById("formularioAdelanto").style.display = "none";
+      document.getElementById("monto").value = "";
+      document.getElementById("celular").value = "";
+      rotarA('adelanto');
+      document.getElementById("mensajeConfirmacion").innerText = `Hola ${datosUsuario.nombre1} ${datosUsuario.apellido1} ! Ingrese los datos de su solicitud.`;
+    }
+
+    function mostrarHistorial(historial) {
+      const contenedor = document.getElementById("tablaHistorial");
+      if (historial.length === 0) {
+        contenedor.innerHTML = "<p>No hay solicitudes registradas.</p>";
+        return;
+      }
+      let html = "<table><tr><th>Fecha</th><th>Monto</th><th>Mes</th></tr>";
+      historial.forEach(fila => {
+        html += `<tr><td>${fila.fecha}</td><td>$${fila.monto}</td><td>${fila.hoja}</td></tr>`;
+      });
+      html += "</table>";
+      contenedor.innerHTML = html;
+    }
+
+    function mostrarError(mensaje) {
+      document.getElementById("textoError").innerText = mensaje;
+      document.getElementById("modalError").style.display = "flex";
+    }
+
+    function cerrarModal() {
+      document.getElementById("modalConfirmacion").style.display = "none";
+    }
+
+    function cerrarModalError() {
+      document.getElementById("modalError").style.display = "none";
+    }
+  </script>
+</body>
+</html>
